@@ -1,5 +1,5 @@
 import clientPromise from "../lib/mongodb";
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Router from "next/router";
 
 export default function Proverbs({ proverbs }) {
@@ -8,6 +8,8 @@ export default function Proverbs({ proverbs }) {
     const [mainText, setMainText] = useState("");
     const [editableIndex, setEditableIndex] = useState(-1);
     const [editedText, setEditedText] = useState("");
+    const [isConfirmVisible, setConfirmVisible] = useState(false);
+    const [deleteItemId, setDeleteItemId] = useState(null);
 
     const handleSearch = async (e) => {
         const searchValue = e.target.value;
@@ -47,14 +49,24 @@ export default function Proverbs({ proverbs }) {
         }
     };
 
-    const handleDeleteClick = async (_id) => {
+    const handleDeleteClick = (_id) => {
+        setConfirmVisible(true);
+        setDeleteItemId(_id);
+    };
+
+    const handleCancelDeleteClick = () => {
+        setConfirmVisible(false);
+        setDeleteItemId(null);
+    };
+
+    const handleConfirmDeleteClick = async () => {
         try {
             const response = await fetch(`/api/deleteProverb`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({_id: _id}),
+                body: JSON.stringify({_id: deleteItemId}),
             });
             if (response.ok) {
                 console.log('Proverb deleted successfully');
@@ -111,6 +123,7 @@ export default function Proverbs({ proverbs }) {
             <button
                 className="add"
                 onClick={() => handleAddProverb(mainText)}
+                disabled={mainText === ""}
             >
                 Añadir Refrán
             </button>
@@ -151,6 +164,16 @@ export default function Proverbs({ proverbs }) {
             </ul>
         </div>
         </div>
+        {/* Confirmation Popup */}
+        {isConfirmVisible && (
+            <div className="confirmation-popup">
+                <div className="confirmation-popup-content">
+                <p>¿Seguro que quieres borrar este refrán?</p>
+                <button onClick={handleConfirmDeleteClick}>Sí</button>
+                <button onClick={handleCancelDeleteClick}>No</button>
+                </div>
+            </div>
+        )}
         </>
     );
 }

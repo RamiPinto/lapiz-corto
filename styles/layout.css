@@ -48,7 +48,7 @@ main {
     flex: 1; /* Block 1 takes 50% of the width initially */
     padding: 20px;
     position: relative;
-    max-height: 250px;
+    max-height: 180px;
   }
 
   .writing-block textarea {
@@ -131,7 +131,46 @@ main {
     right: 80px;
   }
 
-  @media (max-width: 768px) {
+  /* Your CSS file */
+
+.confirmation-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Set a high z-index to ensure it appears on top */
+  }
+  
+  .confirmation-popup-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3); /* Optional box shadow for the content */
+  }
+  
+  .confirmation-popup button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  .confirmation-popup button:hover {
+    background-color: #0056b3;
+  }
+  
+
+  @media (max-width: 500px) {
     .container {
       flex-direction: column; /* Stacking blocks on top of each other */
     }
@@ -139,6 +178,7 @@ main {
     .writing-block {
         flex: 1;
     }
+
     .display-block {
       flex: 1; /* Blocks take full width when stacked */
       max-height: 50vh;
