@@ -95,55 +95,62 @@ export default function Proverbs({ proverbs }) {
         }
     };
 
+    const handleCancelClick = async (index) => { 
+        setEditableIndex(-1);
+    };
+
     return (
         <>
-        <input
-            type="text"
-            placeholder="Añade un refrán"
-            className="input"
-            onChange={handleSearch}
-        >
-
-        </input>
-        <button
-            className="add"
-            onClick={() => handleAddProverb(mainText)}
-        >
-            Añadir Refrán
-        </button>
-        <ul className="list">
-            {displayProverbs.length > 0 ? (
-            displayProverbs.map((proverb, index) => (
-                <li key={proverb._id}>
-                    
-                    {editableIndex === index ? (
-                        <>
-                        <input
-                            type="text"
-                            value={editedText}
-                            onChange={(e) => setEditedText(e.target.value)}
-                        />
-                        <button onClick={() => handleSaveClick(index)}>Guardar</button>
-                        </>
-                    ) : (
-                        <>
-                        <span>{proverb.text}</span>
-                        <button onClick={() => handleEditClick(index)}>Editar</button>
-                        </>
-                    )}
-   
-                    <button
-                        className="delete"
-                        onClick={() => handleDeleteClick(proverb._id)}
-                    >
-                        Borrar
-                    </button>
-                </li>
-            ))
-            ) : (
-            <li>No se han encontrado resultados</li>
-            )}
-        </ul>
+        <div className="container">
+        <div className="writing-block">
+            <textarea
+                placeholder="Añade un refrán"
+                onChange={handleSearch}
+            >
+            </textarea>
+            <button
+                className="add"
+                onClick={() => handleAddProverb(mainText)}
+            >
+                Añadir Refrán
+            </button>
+        </div>
+        <div className="display-block">
+            <ul className="list">
+                {displayProverbs.length > 0 ? (
+                displayProverbs.map((proverb, index) => (
+                    <li className="item" key={proverb._id}>
+                        
+                        {editableIndex === index ? (
+                            <>
+                            <textarea
+                                value={editedText}
+                                onChange={(e) => setEditedText(e.target.value)}
+                            />
+                            <button className="save-button" onClick={() => handleSaveClick(index)}>Guardar</button>
+                            <button className="cancel-button" onClick={() => handleCancelClick(index)}>Cancelar</button>
+                            </>
+                        ) : (
+                            <>
+                            <div className="display-text">{proverb.text}</div>
+                            <button className="edit-button" onClick={() => handleEditClick(index)}>Editar</button>
+                            </>
+                        )}
+    
+                        <button
+                            className="delete-button"
+                            onClick={() => handleDeleteClick(proverb._id)}
+                        >
+                            Borrar
+                        </button>
+                    </li>
+                ))
+                ) : (
+                <li className="no-result">No se han encontrado resultados</li>
+                )}
+            </ul>
+        </div>
+        </div>
         </>
     );
 }
@@ -157,6 +164,7 @@ export async function getServerSideProps() {
         const proverbs = await db
             .collection("proverbs")
             .find({})
+            .sort({text: 1})
             .toArray();
 
         return {
