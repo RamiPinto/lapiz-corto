@@ -166,14 +166,16 @@ export default function Proverbs({ proverbs, count }) {
             >
                 Añadir
             </button>
-            <div className="count">{proverbCount} refranes encontrados</div>
-            <div className="filter">
-                <span>Mostrar nuevos </span>
-                <input
-                    type="checkbox"
-                    checked={showNewOnly}
-                    onChange={handleShowNewChange}
-                />
+            <div className="wrapper">
+                <div className="filter">
+                    <span>Mostrar nuevos </span>
+                    <input
+                        type="checkbox"
+                        checked={showNewOnly}
+                        onChange={handleShowNewChange}
+                    />
+                </div>
+                <div className="count">{proverbCount} refranes encontrados</div>
             </div>
         </div>
         <div className="display-block">

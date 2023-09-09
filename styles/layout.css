@@ -66,25 +66,28 @@ main {
 
 .writing-block button{
     position: absolute;
-    bottom: 30px;
-    right: 20px;
+    top: 95px;
+    right: 30px;
+}
+
+.wrapper {
+  display: flex;
 }
 
 .count {
-  position: absolute;
-  bottom: 10px;
-  right: 20px;
+font-size: 10px;
+margin-left: auto;
 }
 
 .filter {
-  position: absolute;
-  bottom: 10px;
-  left: 20px;
+  font-size: 10px;
+  margin-right: auto;
 }
   
   .display-block {
     flex: 1; /* Block 2 takes 50% of the width initially */
-    padding: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
     height: 75vh;
     overflow-x: auto;
   }
