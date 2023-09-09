@@ -2,13 +2,20 @@ import clientPromise from "../lib/mongodb";
 import React, { useState } from 'react';
 import Router from "next/router";
 
-export default function Proverbs({ proverbs }) {
+export default function Proverbs({ proverbs, count }) {
 
     const [displayProverbs, setDisplayProverbs] = useState(proverbs);
     const [mainText, setMainText] = useState("");
     const [editableIndex, setEditableIndex] = useState(-1);
     const [editedText, setEditedText] = useState("");
+    const [editedWritten, setEditedWritten] = useState(false);
+    const [editedOwner, setEditedOwner] = useState("");
+    const [showNewOnly, setShowNewOnly] = useState(false);
+    const [proverbCount, setProverbCount] = useState(count);
+
     const [isConfirmVisible, setConfirmVisible] = useState(false);
+    const [isOwnerVisible, setOwnerVisible] = useState(false);
+
     const [deleteItemId, setDeleteItemId] = useState(null);
 
     const handleSearch = async (e) => {
@@ -21,22 +28,28 @@ export default function Proverbs({ proverbs }) {
             const data = await response.json();
             
             setDisplayProverbs(data);
+            setProverbCount(data.length);
           } catch (error) {
             console.error(error);
           }
         } else {
           setDisplayProverbs(proverbs);
+          setProverbCount(count);
         }
     };
+
+    const handleAddProverb = async () => { 
+        setOwnerVisible(true);
+    };
     
-    const handleAddProverb = async (text) => { 
+    const handleConfirmAddClick = async () => { 
         try {
             const response = await fetch(`/api/addProverb`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({proverb: { text: text }}),
+                body: JSON.stringify({proverb: { text: mainText, owner: editedOwner }}),
             });
             if (response.ok) {
                 console.log('Proverb added successfully');
@@ -47,6 +60,11 @@ export default function Proverbs({ proverbs }) {
         } catch (error) {
             console.error(error);
         }
+    };
+    
+    const handleCancelAddClick = async () => { 
+        setOwnerVisible(false);
+        setEditedOwner("");
     };
 
     const handleDeleteClick = (_id) => {
@@ -82,6 +100,8 @@ export default function Proverbs({ proverbs }) {
     const handleEditClick = (index) => {
         setEditableIndex(index);
         setEditedText(displayProverbs[index].text); // Initialize with current text
+        setEditedWritten(displayProverbs[index].written); // Initialize with current written
+        setEditedOwner(displayProverbs[index].owner); // Initialize with current owner
     };
 
     const handleSaveClick = async (index) => {
@@ -92,7 +112,7 @@ export default function Proverbs({ proverbs }) {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ _id: displayProverbs[index]._id, text: editedText }),
+            body: JSON.stringify({ _id: displayProverbs[index]._id, text: editedText, written: editedWritten, owner: editedOwner }),
           });
     
           if (response.ok) {
@@ -109,7 +129,26 @@ export default function Proverbs({ proverbs }) {
 
     const handleCancelClick = async (index) => { 
         setEditableIndex(-1);
+        setEditedText("");
+        setEditedWritten(false);
+        setEditedOwner("");
     };
+
+    const handleShowNewChange = () => {
+        setShowNewOnly(!showNewOnly);
+
+        // Filter the proverbs based on the checkbox status
+        if (!showNewOnly) {
+          // If the checkbox is checked, filter only unwritten proverbs
+          const newProverbs = proverbs.filter(proverb => !proverb.written);
+          setDisplayProverbs(newProverbs);
+          setProverbCount(newProverbs.length);
+        } else {
+          // If the checkbox is unchecked, show all proverbs
+          setDisplayProverbs(proverbs);
+          setProverbCount(count);
+        }
+      };
 
     return (
         <>
@@ -125,8 +164,17 @@ export default function Proverbs({ proverbs }) {
                 onClick={() => handleAddProverb(mainText)}
                 disabled={mainText === ""}
             >
-                Añadir Refrán
+                Añadir
             </button>
+            <div className="count">{proverbCount} refranes encontrados</div>
+            <div className="filter">
+                <span>Mostrar nuevos </span>
+                <input
+                    type="checkbox"
+                    checked={showNewOnly}
+                    onChange={handleShowNewChange}
+                />
+            </div>
         </div>
         <div className="display-block">
             <ul className="list">
@@ -136,16 +184,36 @@ export default function Proverbs({ proverbs }) {
                         
                         {editableIndex === index ? (
                             <>
+                            <div className="is-new">
+                                <span>Registrado </span>
+                                <input
+                                    type="checkbox"
+                                    checked={editedWritten}
+                                    onChange={(e) => setEditedWritten(e.target.checked)}
+                                />
+                            </div>
                             <textarea
                                 value={editedText}
                                 onChange={(e) => setEditedText(e.target.value)}
+                            />
+                            <input
+                                type="text"
+                                className="owner-edit"
+                                value={editedOwner}
+                                onChange={(e) => setEditedOwner(e.target.value)}
                             />
                             <button className="save-button" onClick={() => handleSaveClick(index)}>Guardar</button>
                             <button className="cancel-button" onClick={() => handleCancelClick(index)}>Cancelar</button>
                             </>
                         ) : (
                             <>
-                            <div className="display-text">{proverb.text}</div>
+                            {
+                                proverb.written ? 
+                                null
+                                : <div className="new-tag">NUEVO</div>
+                            }
+                            <div className="display-text"><div id="display-text-child">"{proverb.text}"</div></div>
+                            <div className="owner-text">{proverb.owner}</div>
                             <button className="edit-button" onClick={() => handleEditClick(index)}>Editar</button>
                             </>
                         )}
@@ -174,6 +242,26 @@ export default function Proverbs({ proverbs }) {
                 </div>
             </div>
         )}
+        {/* Owner Popup */}
+        {isOwnerVisible && (
+            <div className="owner-popup">
+                <div className="owner-popup-content">
+                <p>¿Quién ha recordado este refrán?</p>
+                <input
+                    type="text"
+                    placeholder="Escribe aquí"
+                    onChange={(e) => setEditedOwner(e.target.value)}
+                />
+                <button 
+                    onClick={handleConfirmAddClick}
+                    disabled={editedOwner === ""}
+                >
+                    Guardar
+                </button>
+                <button onClick={handleCancelAddClick}>Cancelar</button>
+                </div>
+            </div>
+        )}
         </>
     );
 }
@@ -189,9 +277,13 @@ export async function getServerSideProps() {
             .find({})
             .sort({text: 1})
             .toArray();
+        
+        const count = await db
+            .collection("proverbs")
+            .countDocuments({}, { hint: "_id_" });
 
         return {
-            props: { proverbs: JSON.parse(JSON.stringify(proverbs)) },
+            props: { proverbs: JSON.parse(JSON.stringify(proverbs)), count: JSON.parse(JSON.stringify(count)) },
         };
 
     }

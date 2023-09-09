@@ -7,9 +7,10 @@ export default async (req, res) => {
         const db = client.db("lapizcorto");
 
         const { proverb } = req.body;
-        console.log(proverb);
+
         proverb.timestamp = new Date();
-        proverb.variants = [];
+        proverb.lastUpdateTimestamp = new Date();
+        proverb.written = false;
         
         const result = await db
             .collection("proverbs")
