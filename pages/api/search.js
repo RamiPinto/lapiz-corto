@@ -16,7 +16,7 @@ export default async (req, res) => {
         const agg = [
             {
                 $search: {
-                    index: 'default',
+                    index: 'search',
                     text: {
                         query: searchQuery,
                         path: {
