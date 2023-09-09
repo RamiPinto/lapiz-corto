@@ -70,6 +70,19 @@ main {
     right: 30px;
 }
 
+.duplicate-tag {
+  font-size: 8px;
+  font-weight: bold;
+  background-color: #bb1401;
+  color: white;
+  border-radius: 10px;
+  position: absolute;
+  top: 65px;
+  right: 25px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
 .wrapper {
   display: flex;
 }

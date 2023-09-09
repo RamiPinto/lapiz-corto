@@ -33,13 +33,19 @@ export default async (req, res) => {
                   text: 1,
                   score: { $meta: 'searchScore' }, // you are already adding the field here.
                  },
-            }
+            },
+            {
+                $sort:{
+                    score: -1,
+                  },
+              },
         ];
         
         const result = await db
             .collection("proverbs")
             .aggregate(agg)
             .toArray();
+        console.log(result);
 
         res.status(200).json(result);
 

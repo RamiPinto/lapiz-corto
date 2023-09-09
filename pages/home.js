@@ -154,6 +154,11 @@ export default function Proverbs({ proverbs, count }) {
         <>
         <div className="container">
         <div className="writing-block">
+            {
+                displayProverbs[0].score > 5 ? 
+                <p className="duplicate-tag">POSIBLE DUPLICADO</p>
+                : null
+            }
             <textarea
                 placeholder="Añade un refrán"
                 onChange={handleSearch}
