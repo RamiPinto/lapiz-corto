@@ -19,9 +19,7 @@ export default async (req, res) => {
                     index: 'search',
                     text: {
                         query: searchQuery,
-                        path: {
-                            wildcard: '*',
-                        },
+                        path: "text",
                         fuzzy: {
                             maxEdits: 2, // Adjust the number of maximum edits for typo-tolerance
                         }
@@ -31,6 +29,9 @@ export default async (req, res) => {
             {
                 $project: {
                   text: 1,
+                  owner: 1, 
+                  written: 1,
+                  duplicate:1,
                   score: { $meta: 'searchScore' }, // you are already adding the field here.
                  },
             },
